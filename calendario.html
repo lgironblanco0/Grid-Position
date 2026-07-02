@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario — GRID POSITION</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Syne:wght@800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="header">
+        <div class="container header-layout">
+            <div class="header-left">
+                <a href="index.html" class="logo">GRID POSITION</a>
+                <div class="countdown-widget">
+                    <span class="next-race-label">PRÓXIMO GP: REINO UNIDO 🇬🇧</span>
+                    <span id="countdown-timer">00d 00h 00m 00s</span>
+                </div>
+            </div>
+
+            <input type="checkbox" id="menu-toggle" class="menu-checkbox">
+            <label for="menu-toggle" class="hamburger-btn">
+                <span class="line"></span>
+                <span class="line"></span>
+            </label>
+
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-link">Campeonato</a>
+                <a href="calendario.html" class="nav-link active">Calendario</a>
+                <a href="equipos.html" class="nav-link">Equipos y Pilotos</a>
+                <a href="anatomia.html" class="nav-link">Anatomía Técnica</a>
+                <a href="eras.html" class="nav-link">Eras</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero-project">
+            <div class="container">
+                <span class="hero-tag">PROGRAMACIÓN DE LA TEMPORADA</span>
+                <h1 class="hero-title">RACE CALENDAR</h1>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container calendar-layout">
+                <div class="card-container">
+                    <h3>GP de Bahrein</h3>
+                    <p>Sakhir — Concluido</p>
+                </div>
+                <div class="card-container">
+                    <h3>GP de Arabia Saudí</h3>
+                    <p>Jeddah — Concluido</p>
+                </div>
+                <div class="card-container">
+                    <h3>GP de Australia</h3>
+                    <p>Melbourne — Concluido</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 GRID POSITION — Desarrollado por Luis Girón</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

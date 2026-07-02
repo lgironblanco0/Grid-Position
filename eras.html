@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evolución de Eras — GRID POSITION</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Syne:wght@800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="header">
+        <div class="container header-layout">
+            <div class="header-left">
+                <a href="index.html" class="logo">GRID POSITION</a>
+                <div class="countdown-widget">
+                    <span class="next-race-label">PRÓXIMO GP: REINO UNIDO 🇬🇧</span>
+                    <span id="countdown-timer">00d 00h 00m 00s</span>
+                </div>
+            </div>
+
+            <input type="checkbox" id="menu-toggle" class="menu-checkbox">
+            <label for="menu-toggle" class="hamburger-btn">
+                <span class="line"></span>
+                <span class="line"></span>
+            </label>
+
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-link">Campeonato</a>
+                <a href="calendario.html" class="nav-link">Calendario</a>
+                <a href="equipos.html" class="nav-link">Equipos y Pilotos</a>
+                <a href="anatomia.html" class="nav-link">Anatomía Técnica</a>
+                <a href="eras.html" class="nav-link active">Eras</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero-project">
+            <div class="container">
+                <span class="hero-tag">MECÁNICA PURA VS. TELEMETRÍA AVANZADA</span>
+                <h1 class="hero-title">EVOLUTION OF ERAS</h1>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container eras-layout">
+                <div class="card-container era-card">
+                    <div class="era-header">
+                        <span class="era-years">2000 — 2013</span>
+                        <span class="era-badge classic-badge">ATMOSFÉRICOS V10 / V8</span>
+                    </div>
+                    <h2 class="era-title-text">La Era del Rugido y la Ligereza</h2>
+                    <p class="era-description">Monoplazas ligeros (~600 kg) guiados por la aerodinámica externa pura.</p>
+                </div>
+                <div class="card-container era-card highlight-era">
+                    <div class="era-header">
+                        <span class="era-years" style="color: #e10600;">2014 — PRESENTE</span>
+                        <span class="era-badge modern-badge">HÍBRIDOS V6 TURBO</span>
+                    </div>
+                    <h2 class="era-title-text">La Era de la Eficiencia Absoluta</h2>
+                    <p class="era-description">Verdaderos laboratorios rodantes propulsados por energía eléctrica y térmica integrada.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 GRID POSITION — Desarrollado por Luis Girón</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
