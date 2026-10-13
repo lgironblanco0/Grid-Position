@@ -127,7 +127,8 @@ a:focus-visible, button:focus-visible, input:focus-visible + .hamburger {
     font-weight: 800;
     letter-spacing: -.035em;
     line-height: 1.08;
-    overflow-wrap: anywhere;
+    overflow-wrap: normal;
+    word-break: normal;
     text-wrap: balance;
     text-transform: uppercase;
 }
@@ -430,6 +431,7 @@ a:focus-visible, button:focus-visible, input:focus-visible + .hamburger {
     .menu-checkbox:checked ~ .main-nav { visibility: visible; opacity: 1; transform: translateY(0); pointer-events: auto; }
     .nav-link { padding: 12px; font-size: 14px; }
     .hero { padding: 44px 0 34px; }
+    .page-title { font-size: clamp(30px, 7.4vw, 52px); }
     .section { padding: 18px 0 64px; }
     .data-grid, .team-detail-grid, .driver-profile { grid-template-columns: 1fr; }
     .home-rankings { grid-template-columns: 1fr; }
@@ -443,7 +445,7 @@ a:focus-visible, button:focus-visible, input:focus-visible + .hamburger {
 @media (max-width: 430px) {
     .container { width: min(100% - 26px, 1200px); }
     .roster-grid, .champion-list { grid-template-columns: 1fr; }
-    .page-title { font-size: clamp(32px, 10vw, 44px); }
+    .page-title { font-size: clamp(24px, 7vw, 32px); }
     .countdown-widget { max-width: 68vw; }
 }
 
