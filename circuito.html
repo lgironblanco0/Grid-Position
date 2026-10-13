@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#05050A">
+    <title>Ficha de circuito — GRID POSITION</title><link rel="icon" type="image/svg+xml" href="favicon.svg"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Syne:wght@400..800&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css">
+</head>
+<body class="static-content-page">
+    <a class="skip-link" href="#main-content">Saltar al contenido</a>
+    <header class="site-header"><div class="container header-inner">
+        <div class="brand-block"><a class="brand" href="index.html">GRID POSITION</a><div class="countdown-widget"><span class="next-race-label">Cargando archivo local…</span><span id="countdown-timer" class="countdown-value">—</span></div></div>
+        <input class="menu-checkbox" type="checkbox" id="menu-toggle" aria-label="Abrir menú"><label class="hamburger" for="menu-toggle" aria-hidden="true"><span></span><span></span><span class="sr-only">Menú</span></label>
+        <nav class="main-nav" aria-label="Navegación principal">
+            <a class="nav-link" href="index.html">Campeonato</a><a class="nav-link" href="calendario.html">Calendario</a><a class="nav-link" href="equipos.html">Equipos y Pilotos</a><a class="nav-link" href="anatomia.html">Anatomía Técnica</a><a class="nav-link" href="eras.html">Eras de la F1</a><a class="nav-link" href="circuitos.html" aria-current="page">Circuitos</a><a class="nav-link" href="noticias.html">Noticias</a>
+        </nav>
+    </div></header>
+    <main id="main-content">
+        <section class="hero"><div class="container"><span class="eyebrow">FICHA HISTÓRICA DEL TRAZADO</span><h1 id="circuit-title" class="page-title">Circuito</h1><p id="circuit-location" class="page-intro"></p></div></section>
+        <section class="section"><div class="container">
+            <p id="circuit-status" class="data-status" role="status">Cargando información local…</p>
+            <section id="circuit-detail" class="detail-panel"><h2>Historia</h2><p id="circuit-history-copy" class="driver-bio"></p><h2>Grandes Premios del archivo 2024</h2><ul id="circuit-history" class="circuit-detail-list"></ul></section>
+            <p class="data-note">El archivo no contiene coordenadas ni geometría cartográfica. No se dibuja un mapa aproximado como si fuera el diseño oficial.</p>
+            <a class="back-link" href="circuitos.html">← Volver a circuitos</a>
+        </div></section>
+    </main>
+    <footer class="footer"><div class="container"><p>© 2026 GRID POSITION — Desarrollado por Luis Girón</p></div></footer>
+    <script src="f1-data.js"></script><script src="blog-data.js"></script><script src="site.js"></script>
+</body>
+</html>

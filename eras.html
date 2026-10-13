@@ -1,78 +1,31 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Evolución de Eras — GRID POSITION</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Syne:wght@800&display=swap" rel="stylesheet">
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#05050A">
+    <title>Eras de la F1 — GRID POSITION</title><link rel="icon" type="image/svg+xml" href="favicon.svg"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Syne:wght@400..800&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css">
 </head>
-<body>
-
-    <header class="header">
-        <div class="container header-layout">
-            <div class="header-left">
-                <a href="index.html" class="logo">GRID POSITION</a>
-                <div class="countdown-widget">
-                    <span class="next-race-label">PRÓXIMO GP: REINO UNIDO 🇬🇧</span>
-                    <span id="countdown-timer">00d 00h 00m 00s</span>
-                </div>
-            </div>
-
-            <input type="checkbox" id="menu-toggle" class="menu-checkbox">
-            <label for="menu-toggle" class="hamburger-btn">
-                <span class="line"></span>
-                <span class="line"></span>
-            </label>
-
-            <nav class="nav-menu">
-                <a href="index.html" class="nav-link">Campeonato</a>
-                <a href="calendario.html" class="nav-link">Calendario</a>
-                <a href="equipos.html" class="nav-link">Equipos y Pilotos</a>
-                <a href="anatomia.html" class="nav-link">Anatomía Técnica</a>
-                <a href="eras.html" class="nav-link active">Eras</a>
-            </nav>
-        </div>
-    </header>
-
-    <main>
-        <section class="hero-project">
-            <div class="container">
-                <span class="hero-tag">MECÁNICA PURA VS. TELEMETRÍA AVANZADA</span>
-                <h1 class="hero-title">EVOLUTION OF ERAS</h1>
-            </div>
-        </section>
-
-        <section class="section">
-            <div class="container eras-layout">
-                <div class="card-container era-card">
-                    <div class="era-header">
-                        <span class="era-years">2000 — 2013</span>
-                        <span class="era-badge classic-badge">ATMOSFÉRICOS V10 / V8</span>
-                    </div>
-                    <h2 class="era-title-text">La Era del Rugido y la Ligereza</h2>
-                    <p class="era-description">Monoplazas ligeros (~600 kg) guiados por la aerodinámica externa pura.</p>
-                </div>
-                <div class="card-container era-card highlight-era">
-                    <div class="era-header">
-                        <span class="era-years" style="color: #e10600;">2014 — PRESENTE</span>
-                        <span class="era-badge modern-badge">HÍBRIDOS V6 TURBO</span>
-                    </div>
-                    <h2 class="era-title-text">La Era de la Eficiencia Absoluta</h2>
-                    <p class="era-description">Verdaderos laboratorios rodantes propulsados por energía eléctrica y térmica integrada.</p>
-                </div>
-            </div>
-        </section>
+<body class="static-content-page">
+    <a class="skip-link" href="#main-content">Saltar al contenido</a>
+    <header class="site-header"><div class="container header-inner">
+        <div class="brand-block"><a class="brand" href="index.html">GRID POSITION</a><div class="countdown-widget"><span class="next-race-label">Cargando archivo local…</span><span id="countdown-timer" class="countdown-value">—</span></div></div>
+        <input class="menu-checkbox" type="checkbox" id="menu-toggle" aria-label="Abrir menú"><label class="hamburger" for="menu-toggle" aria-hidden="true"><span></span><span></span><span class="sr-only">Menú</span></label>
+        <nav class="main-nav" aria-label="Navegación principal">
+            <a class="nav-link" href="index.html">Campeonato</a><a class="nav-link" href="calendario.html">Calendario</a><a class="nav-link" href="equipos.html">Equipos y Pilotos</a><a class="nav-link" href="anatomia.html">Anatomía Técnica</a><a class="nav-link" href="eras.html" aria-current="page">Eras de la F1</a><a class="nav-link" href="circuitos.html">Circuitos</a><a class="nav-link" href="noticias.html">Noticias</a>
+        </nav>
+    </div></header>
+    <main id="main-content">
+        <section class="hero"><div class="container"><span class="eyebrow">ARCHIVO TÉCNICO E HISTÓRICO · CONTENIDO LOCAL</span><h1 class="page-title">Eras de la Fórmula 1</h1><p class="page-intro">Artículos para descubrir cómo evolucionaron los monoplazas, sus motores y las reglas que transformaron el campeonato.</p></div></section>
+        <section class="section"><div class="container">
+            <p id="eras-status" class="data-status" role="status">Cargando artículos históricos locales…</p>
+            <div id="eras-list" class="blog-grid"></div>
+            <section id="campeones" class="champion-section" aria-labelledby="champions-heading">
+                <h2 id="champions-heading" class="section-heading">Campeones históricos</h2>
+                <p id="champions-status" class="data-status" role="status">Cargando campeones del archivo local…</p>
+                <ul id="champion-list" class="champion-list"></ul>
+            </section>
+        </div></section>
     </main>
-
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2026 GRID POSITION — Desarrollado por Luis Girón</p>
-        </div>
-    </footer>
-
-    <script src="script.js"></script>
+    <footer class="footer"><div class="container"><p>© 2026 GRID POSITION — Desarrollado por Luis Girón</p></div></footer>
+    <script src="f1-data.js"></script><script src="blog-data.js"></script><script src="site.js"></script>
 </body>
 </html>
