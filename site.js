@@ -1134,21 +1134,59 @@
     async function loadLiveNews() {
         const status = byId('news-status');
         try {
-            const response = await fetch(`/api/news?_=${Date.now()}`, {
+            const feedUrl = new URL('https://api.rss2json.com/v1/api.json');
+            feedUrl.searchParams.set('rss_url', 'https://es.motorsport.com/rss/f1/news/');
+            feedUrl.searchParams.set('count', '10');
+            feedUrl.searchParams.set('_', String(Date.now()));
+            const response = await fetch(feedUrl, {
                 headers: { Accept: 'application/json' },
                 cache: 'no-store'
             });
-            const payload = await response.json();
+            const responseText = await response.text();
+            let payload;
+            try {
+                payload = JSON.parse(responseText);
+            } catch {
+                throw new Error('El conversor RSS devolvió una respuesta no válida.');
+            }
             if (!response.ok) {
-                throw new Error(payload.error || `El servidor respondió HTTP ${response.status}.`);
+                throw new Error(payload.message || `RSS2JSON respondió HTTP ${response.status}.`);
             }
-            if (payload.provider !== 'Bing News RSS · España' || !Array.isArray(payload.articles) || !payload.articles.length) {
-                throw new Error('El feed RSS devolvió un formato de noticias no válido.');
+            if (payload.status !== 'ok' || !Array.isArray(payload.items)) {
+                throw new Error(payload.message || 'El feed RSS no devolvió noticias válidas.');
             }
+            const articles = payload.items.map(item => {
+                const descriptionDocument = new DOMParser().parseFromString(
+                    item.description || item.content || '',
+                    'text/html'
+                );
+                const description = (descriptionDocument.body.textContent || '')
+                    .replace(/\s+/g, ' ')
+                    .trim()
+                    .slice(0, 360);
+                let articleUrl = '';
+                try {
+                    const parsedUrl = new URL(item.link);
+                    if (parsedUrl.protocol === 'https:') articleUrl = parsedUrl.href;
+                } catch {
+                    return null;
+                }
+                if (!item.title || !description || !articleUrl) return null;
+                return {
+                    title: item.title.trim(),
+                    description,
+                    link: articleUrl,
+                    publishedAt: item.pubDate
+                };
+            }).filter(Boolean).slice(0, 10);
+            if (!articles.length) {
+                throw new Error('El feed RSS no contiene titulares con enlaces válidos.');
+            }
+            const source = payload.feed?.title || 'Motorsport.com · Fórmula 1';
             const fragment = document.createDocumentFragment();
-            payload.articles.forEach(article => {
+            articles.forEach(article => {
                 const card = create('article', 'article-card');
-                card.append(create('span', 'article-tag', article.source || 'FÓRMULA 1 · ACTUALIDAD'));
+                card.append(create('span', 'article-tag', source));
                 card.append(create('h2', '', article.title));
                 card.append(create('p', '', article.description));
                 if (article.publishedAt) {
@@ -1169,10 +1207,10 @@
                 fragment.append(card);
             });
             byId('news-list').replaceChildren(fragment);
-            status.textContent = `${payload.articles.length} noticias de medios en español · actualizado desde ${payload.provider}.`;
+            status.textContent = `${articles.length} noticias de Fórmula 1 en español · actualizado desde ${source}.`;
         } catch (error) {
             console.error('No se pudo mostrar el feed actual de noticias:', error);
-            status.textContent = `El feed de noticias no está disponible (${error.message}). Se muestran contenidos editoriales locales como respaldo; no son noticias de actualidad.`;
+            status.textContent = `Las noticias actuales no están disponibles (${error.message}). Se muestran contenidos editoriales locales como respaldo; no son noticias de actualidad.`;
         }
     }
 
