@@ -41,6 +41,7 @@
     let nextScheduledRace = data.nextRace;
     let calendarSeason = data.season;
     let countdownInterval;
+    let countdownRefreshRequested = false;
     const teamFor = id =>
         currentTeams.find(team => team.id === id) || data.teams.find(team => team.id === id);
     const driverFor = id =>
@@ -52,6 +53,7 @@
 
     function setNextRaceCountdown(race) {
         nextScheduledRace = race;
+        countdownRefreshRequested = false;
         document.querySelectorAll('.next-race-label').forEach(label => {
             label.textContent = nextScheduledRace
                 ? `PRÓXIMO GP: ${nextScheduledRace.name}`
@@ -75,7 +77,8 @@
             const remaining = target - Date.now();
             if (remaining <= 0) {
                 timer.textContent = 'EN CURSO / FINALIZADO';
-                if (localToday() > nextScheduledRace.startAt.slice(0, 10)) {
+                if (localToday() > nextScheduledRace.startAt.slice(0, 10) && !countdownRefreshRequested) {
+                    countdownRefreshRequested = true;
                     loadGlobalCountdown();
                 }
                 return;
@@ -237,28 +240,90 @@
         back.hidden = false;
     }
 
+    async function fetchJolpicaJson(resource, description) {
+        const url = new URL(`https://api.jolpi.ca/ergast/f1/${resource}`);
+        url.searchParams.set('_', String(Date.now()));
+        const response = await fetch(url, {
+            headers: { Accept: 'application/json' },
+            cache: 'no-store'
+        });
+        const responseText = await response.text();
+        let payload;
+        try {
+            payload = JSON.parse(responseText);
+        } catch {
+            throw new Error(`Jolpica devolvió JSON inválido al consultar ${description}.`);
+        }
+        if (!response.ok) {
+            throw new Error(`Jolpica respondió HTTP ${response.status} al consultar ${description}.`);
+        }
+        return payload;
+    }
+
     function getCurrentCalendar() {
         if (!calendarPromise) {
             calendarPromise = (async () => {
-                const response = await fetch(`/api/calendar?_=${Date.now()}`, {
-                    headers: { Accept: 'application/json' },
-                    cache: 'no-store'
-                });
-                const contentType = response.headers.get('content-type') || '';
-                const responseText = await response.text();
-                let payload;
-                try {
-                    payload = JSON.parse(responseText);
-                } catch {
-                    throw new Error(`El servidor devolvió contenido no JSON (${contentType || 'tipo desconocido'}).`);
-                }
-                if (!response.ok) {
-                    throw new Error(payload.error || `El servidor respondió HTTP ${response.status}.`);
-                }
-                if (!Array.isArray(payload.races) || payload.races.length === 0) {
+                const payload = await fetchJolpicaJson('current.json?limit=100', 'el calendario');
+                const raceTable = payload?.MRData?.RaceTable;
+                const sourceRaces = raceTable?.Races;
+                if (!Array.isArray(sourceRaces) || sourceRaces.length === 0) {
                     throw new Error('No se recibió un calendario de carreras válido.');
                 }
-                return payload;
+                let resultsByRound = new Map();
+                try {
+                    const resultsPayload = await fetchJolpicaJson(
+                        `${raceTable.season}/results/1.json?limit=100`,
+                        `los resultados de ${raceTable.season}`
+                    );
+                    const resultRaces = resultsPayload?.MRData?.RaceTable?.Races;
+                    if (Array.isArray(resultRaces)) {
+                        resultsByRound = new Map(resultRaces.map(race => [Number(race.round), race]));
+                    }
+                } catch (error) {
+                    console.error('No se pudieron añadir ganadores al calendario de Jolpica:', error);
+                }
+
+                const races = sourceRaces.map(race => {
+                    const winner = resultsByRound.get(Number(race.round))
+                        ?.Results?.find(result => result.position === '1');
+                    return {
+                        round: Number(race.round),
+                        name: race.raceName,
+                        date: race.date,
+                        time: race.time || '',
+                        circuitId: race.Circuit?.circuitId || '',
+                        circuitName: race.Circuit?.circuitName || '',
+                        city: race.Circuit?.Location?.locality || '',
+                        country: race.Circuit?.Location?.country || '',
+                        latitude: Number(race.Circuit?.Location?.lat),
+                        longitude: Number(race.Circuit?.Location?.long),
+                        winner: winner ? {
+                            name: [winner.Driver?.givenName, winner.Driver?.familyName].filter(Boolean).join(' '),
+                            number: Number(winner.Driver?.permanentNumber) || null,
+                            team: winner.Constructor?.name || '',
+                            raceTime: winner.Time?.time || '',
+                            fastestLap: winner.FastestLap?.Time?.time || '',
+                            fastestLapNumber: Number(winner.FastestLap?.lap) || null,
+                            season: Number(race.season),
+                            round: Number(race.round)
+                        } : null,
+                        lastWinner: null
+                    };
+                }).sort((a, b) => a.date.localeCompare(b.date) || a.round - b.round);
+
+                if (races.some(race =>
+                    !Number.isInteger(race.round) ||
+                    !race.name ||
+                    !/^\d{4}-\d{2}-\d{2}$/.test(race.date) ||
+                    !race.circuitName
+                )) {
+                    throw new Error('Jolpica devolvió carreras incompletas.');
+                }
+                return {
+                    provider: 'Jolpica',
+                    season: String(raceTable.season || new Date().getUTCFullYear()),
+                    races
+                };
             })().catch(error => {
                 calendarPromise = null;
                 throw error;
@@ -387,18 +452,80 @@
         if (!currentStandingsPromise) {
             currentStandingsPromise = (async () => {
                 try {
-                    const response = await fetch(`/api/standings?_=${Date.now()}`, {
-                        headers: { Accept: 'application/json' },
-                        cache: 'no-store'
+                    const [driversPayload, constructorsPayload, latestRacePayload] = await Promise.all([
+                        fetchJolpicaJson('current/driverStandings.json?limit=100', 'la clasificación de pilotos'),
+                        fetchJolpicaJson('current/constructorStandings.json?limit=100', 'la clasificación de constructores'),
+                        fetchJolpicaJson('current/last/results.json?limit=100', 'la parrilla del último Gran Premio')
+                    ]);
+                    const driverList = driversPayload?.MRData?.StandingsTable?.StandingsLists?.[0];
+                    const constructorList = constructorsPayload?.MRData?.StandingsTable?.StandingsLists?.[0];
+                    const latestRace = latestRacePayload?.MRData?.RaceTable?.Races?.[0];
+                    const standingsDrivers = driverList?.DriverStandings;
+                    const constructorStandings = constructorList?.ConstructorStandings;
+                    const latestResults = latestRace?.Results;
+                    if (!Array.isArray(standingsDrivers) || !standingsDrivers.length ||
+                        !Array.isArray(constructorStandings) || !constructorStandings.length ||
+                        !Array.isArray(latestResults) || !latestResults.length) {
+                        throw new Error('Jolpica devolvió clasificaciones o una parrilla incompletas.');
+                    }
+
+                    const driversById = new Map(standingsDrivers.map(item => [item.Driver.driverId, {
+                        id: item.Driver.driverId,
+                        name: [item.Driver.givenName, item.Driver.familyName].filter(Boolean).join(' '),
+                        number: Number(item.Driver.permanentNumber) || null,
+                        nationality: item.Driver.nationality || '',
+                        position: Number(item.position),
+                        points: Number(item.points),
+                        wins: Number(item.wins),
+                        teamId: '',
+                        teamName: ''
+                    }]));
+                    const lineups = new Map();
+                    latestResults.forEach(result => {
+                        const driverId = result.Driver?.driverId;
+                        const teamId = result.Constructor?.constructorId;
+                        if (!driverId || !teamId) return;
+                        let driver = driversById.get(driverId);
+                        if (!driver) {
+                            driver = {
+                                id: driverId,
+                                name: [result.Driver.givenName, result.Driver.familyName].filter(Boolean).join(' '),
+                                number: Number(result.Driver.permanentNumber) || null,
+                                nationality: result.Driver.nationality || '',
+                                position: null,
+                                points: 0,
+                                wins: 0,
+                                teamId,
+                                teamName: result.Constructor.name || ''
+                            };
+                            driversById.set(driverId, driver);
+                        }
+                        driver.teamId = teamId;
+                        driver.teamName = result.Constructor.name || '';
+                        if (!lineups.has(teamId)) lineups.set(teamId, []);
+                        lineups.get(teamId).push(driver);
                     });
-                    const payload = await response.json();
-                    if (!response.ok) {
-                        throw new Error(payload.error || `Jolpica respondió HTTP ${response.status}.`);
-                    }
-                    if (!Array.isArray(payload.teams) || !Array.isArray(payload.drivers) ||
-                        !payload.teams.length || !payload.drivers.length) {
-                        throw new Error('Jolpica devolvió clasificaciones incompletas.');
-                    }
+
+                    const teams = constructorStandings.map(item => ({
+                        id: item.Constructor.constructorId,
+                        name: item.Constructor.name,
+                        shortName: item.Constructor.name,
+                        position: Number(item.position),
+                        points: Number(item.points),
+                        wins: Number(item.wins),
+                        drivers: (lineups.get(item.Constructor.constructorId) || [])
+                            .sort((a, b) => (a.position || Number.MAX_SAFE_INTEGER) - (b.position || Number.MAX_SAFE_INTEGER))
+                    }));
+                    const payload = {
+                        provider: 'Jolpica',
+                        season: String(driverList.season || constructorList.season || new Date().getUTCFullYear()),
+                        round: Number(driverList.round || constructorList.round || 0),
+                        latestRace: latestRace.raceName,
+                        teams,
+                        drivers: [...driversById.values()]
+                            .filter(driver => driver.teamId)
+                            .sort((a, b) => (a.position || Number.MAX_SAFE_INTEGER) - (b.position || Number.MAX_SAFE_INTEGER))
+                    };
                     applyCurrentStandings(payload);
                 } catch (error) {
                     console.error('No se pudieron cargar las clasificaciones actuales de Jolpica:', error);
